@@ -14,6 +14,7 @@
 </p>
 <br>
 <p align="center">
-  I'll include more details as the project is developed 😉
+  I'll include more details as the project is developed but<br>
+  in the meantime check out the <a href="https://github.com/asanull/engine.js/wiki">Wiki</a> here on GitHub.
 </p>
 <br>
