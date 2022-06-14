@@ -6,7 +6,20 @@ let engine = {
 three.loaded = new Promise(resolve => three.ready = resolve)
 engine.ready.scene = new Promise(resolve => engine.loaded.scene = resolve)
 engine.ready.camera = new Promise(resolve => engine.loaded.camera = resolve)
-import('/three.js').then(async () => three.ready())
+import('/three.js').then(async () => {
+    three.ready()
+    engine.mouse = {
+        screenPosition: {
+            x: 0,
+            y: 0
+        },
+        worldPosition: new THREE.Vector3(),
+    }
+    document.addEventListener('mousemove', function (event) {
+        engine.mouse.screenPosition.x = (event.clientX / window.innerWidth) * 2 - 1;
+        engine.mouse.screenPosition.y = (event.clientY / window.innerHeight) * 2 - 1;
+    })
+})
 engine.js = async function () {
     await three.loaded
     let canvas = document.createElement('canvas')
@@ -36,22 +49,29 @@ engine.js = async function () {
     }
     animate();
 }
-engine.load = async function (name, object) {
-    if (typeof name === 'string') {
-        if (object instanceof THREE.Scene) {
-            object.name = name
-            engine.scene = object
-            engine.loaded.scene()
+engine.load = function (object, name) {
+    if (object instanceof THREE.Scene) {
+        engine.scene = object
+        engine.loaded.scene()
 
-        } else if (object instanceof THREE.Camera) {
-            object.name = name
-            engine.camera = object
-            engine.loaded.camera()
-
-        } else if (object instanceof THREE.Light) {
-            console.log('engine.js [LOAD LIGHT]')
-        }
-    } else console.log('name is not good enough')
+    }
+    if (name !== undefined) object.name = name
+}
+engine.add = function (object, name) {
+    if (object instanceof THREE.Camera) {
+        engine.camera = object
+        engine.loaded.camera()
+    }
+    else if (object instanceof THREE.Object3D) {
+        engine.scene.add(object)
+    }
+    else if (object instanceof THREE.Geometry) {
+        let mesh = new THREE.Mesh(object)
+        engine.scene.add(mesh)
+    } else if (object instanceof THREE.Light) {
+        engine.scene.add(object)
+    }
+    if (name !== undefined) object.name = name
 }
 var map = {}
 onkeydown = onkeyup = function (e) {
@@ -137,4 +157,9 @@ engine.getKey = function (character) {
     }
     if (map[key.code] === true) return true
     else return false
+}
+engine.object = function (geometry, material, name) {
+    let object = new THREE.Mesh(geometry, material)
+    if (name !== undefined) object.name = name
+    return object
 }
