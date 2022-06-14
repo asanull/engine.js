@@ -1,12 +1,15 @@
 let three = {}
 let engine = {
-    ready: {},
-    loaded: {}
+    ready: {
+        callback: function () {},
+    },
+    loaded: {},
+    update: function () {}
 }
 three.loaded = new Promise(resolve => three.ready = resolve)
 engine.ready.scene = new Promise(resolve => engine.loaded.scene = resolve)
 engine.ready.camera = new Promise(resolve => engine.loaded.camera = resolve)
-import('/three.js').then(async () => {
+import('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.js').then(async () => {
     three.ready()
     engine.mouse = {
         screenPosition: {
@@ -19,10 +22,12 @@ import('/three.js').then(async () => {
         engine.mouse.screenPosition.x = (event.clientX / window.innerWidth) * 2 - 1;
         engine.mouse.screenPosition.y = (event.clientY / window.innerHeight) * 2 - 1;
     })
+    engine.ready.callback()
 })
 engine.js = async function () {
     await three.loaded
     let canvas = document.createElement('canvas')
+    canvas.style = 'position:absolute;top:0;left:0;width:100%;height:100%'
     document.body.appendChild(canvas)
     engine.scene = new THREE.Scene()
     engine.renderer = new THREE.WebGLRenderer({
@@ -45,6 +50,7 @@ engine.js = async function () {
             engine.camera.right = d * window.innerWidth / window.innerHeight;
             engine.camera.updateProjectionMatrix()
             engine.renderer.render(engine.scene, engine.camera);
+            engine.update()
         }
     }
     animate();
@@ -55,10 +61,15 @@ engine.load = function (object, name) {
         engine.loaded.scene()
 
     }
+    else if (object instanceof THREE.GridHelper) {
+        engine.scene.add(object)
+    }
     if (name !== undefined) object.name = name
 }
 engine.add = function (object, name) {
-    if (object instanceof THREE.Camera) {
+    if (object instanceof THREE.Camera && !(object.type == 'PerspectiveCamera' || object instanceof THREE.OrthographicCamera)) {
+        console.log('this class is not intended to be called directly; you probably want a PerspectiveCamera or OrthographicCamera instead.')
+    } else if (object instanceof THREE.PerspectiveCamera || object instanceof THREE.OrthographicCamera) {
         engine.camera = object
         engine.loaded.camera()
     }
