@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -23,6 +24,7 @@
         user-select: none;
     }
 </style>
+
 <body>
     <div id="toggle">
         Switch Perspective
@@ -33,12 +35,12 @@
     let camera = {}
     engine.ready.callback = () => {
         engine.js().then(() => {
-            let scene = new THREE.Scene()               // create a new scene
-        
+            let scene = new THREE.Scene() // create a new scene
+
             let aspect = window.innerWidth / window.innerHeight;
             let d = 20;
             camera.orthographic = new THREE.OrthographicCamera(
-                -d * aspect,                            // left, right, top, bottom, near, far
+                -d * aspect, // left, right, top, bottom, near, far
                 d * aspect,
                 d,
                 -d,
@@ -46,34 +48,34 @@
                 1000
             )
             camera.orthographic.position.set(20, 20, 20) // set the camera position
-            camera.orthographic.lookAt(scene.position)   // look at the center of the scene
+            camera.orthographic.lookAt(scene.position) // look at the center of the scene
 
             camera.perspective = new THREE.PerspectiveCamera(
-                75,                                     // fov, aspect, near, far
+                75, // fov, aspect, near, far
                 window.innerWidth / window.innerHeight,
                 0.1,
                 1000
             )
             camera.perspective.position.set(20, 20, 20) // set the camera position
-            camera.perspective.lookAt(scene.position)   // look at the center of the scene
+            camera.perspective.lookAt(scene.position) // look at the center of the scene
 
-            engine.load(scene, 'myScene')               // load the scene into the engine
-            engine.add(                                 // add the orthographic camera to the scene
+            engine.load(scene, 'myScene') // load the scene into the engine
+            engine.add( // add the orthographic camera to the scene
                 camera.orthographic,
                 'OrthographicCamera'
             )
-            engine.add(                                 // add the perspective camera to the scene
+            engine.add( // add the perspective camera to the scene
                 camera.perspective,
                 'PerspectiveCamera'
             )
 
-            const gridHelper = new THREE.GridHelper(    // create a grid helper
+            const gridHelper = new THREE.GridHelper( // create a grid helper
                 100,
                 10
             )
             engine.load(gridHelper)
 
-            let plane = new THREE.Mesh(                 // create a plane for the raycaster
+            let plane = new THREE.Mesh( // create a plane for the raycaster
                 new THREE.PlaneGeometry(100, 100),
                 new THREE.MeshStandardMaterial({
                     transparent: true,
@@ -82,61 +84,54 @@
             )
             plane.rotation.x = -Math.PI / 2
             engine.add(plane)
-            
-            let object = engine.object(                 // create a new object
-                new THREE.BoxGeometry(10, 10, 10),
-                new THREE.MeshStandardMaterial({ color: 'white' })
-            )
-            object.position.set(0, .1, 0)               // set the position of the object
-            engine.add(object, 'myCube')                // add the object to the scene
 
-            let ambientLight = new THREE.AmbientLight(   // create a new ambient light
-                0xffffff,                               // color
-                .25                                    // intensity
+            let object = engine.object( // create a new object
+                new THREE.BoxGeometry(10, 10, 10),
+                new THREE.MeshStandardMaterial({
+                    color: 'white'
+                })
+            )
+            object.position.set(0, .1, 0) // set the position of the object
+            engine.add(object, 'myCube') // add the object to the scene
+
+            let ambientLight = new THREE.AmbientLight( // create a new ambient light
+                0xffffff, // color
+                .25 // intensity
             )
             engine.add(ambientLight)
 
-            let pointLight = new THREE.PointLight(      // create a new point light
-                0xffffff,                               // color
-                .75,                                      // intensity
-                100                                    // distance
+            let pointLight = new THREE.PointLight( // create a new point light
+                0xffffff, // color
+                .75, // intensity
+                100 // distance
             )
-            engine.add(pointLight, 'myPointLight')     // add the point light to the scene
+            engine.add(pointLight, 'myPointLight') // add the point light to the scene
 
-            engine.update = () => {                     // rotate the object for each frame
+            engine.update = () => { // rotate the object for each frame
                 object.rotation.x += 0.01
                 object.rotation.y += 0.01
 
-                let raycaster = new THREE.Raycaster()   // create a new raycaster
-                raycaster.setFromCamera(                 // set the raycaster from the camera
-                    engine.mouse.screenPosition,
-                    engine.camera
-                )
-                let intersects = raycaster.intersectObjects( // get the intersects of the raycaster
-                    scene.children,
-                    false
-                )
-                if (intersects[0] !== undefined && intersects[0].point !== undefined) { // if the intersects have uv coordinates
-                    pointLight.position.x = intersects[0].point.x
-                    pointLight.position.y = (intersects[0].point.y + 15)
-                    pointLight.position.z = intersects[0].point.z
-                }
-
-                //  console.log(engine.mouse.screenPosition)
+                pointLight.position.x = engine.mouse.worldPosition.x
+                pointLight.position.y = engine.mouse.worldPosition.y + 15
+                pointLight.position.z = engine.mouse.worldPosition.z
             }
         })
     }
 </script>
 <script>
-    let state = true                                    // set the initial state of the toggle
-    function switchCamera() {                           // function to switch the camera
+    let state = true // set the initial state of the toggle
+    function switchCamera() { // function to switch the camera
         switch (state) {
-            case true:engine.camera = camera.orthographic;break;
-            default:engine.camera = camera.perspective
+            case true:
+                engine.camera = camera.orthographic;
+                break;
+            default:
+                engine.camera = camera.perspective
         }
         state = !state
     }
-    document.getElementById('toggle')                   // add the event listener to the toggle
+    document.getElementById('toggle') // add the event listener to the toggle
         .addEventListener('click', switchCamera)
 </script>
+
 </html>
