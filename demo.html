@@ -72,17 +72,34 @@
                 10
             )
             engine.load(gridHelper)
+
+            let plane = new THREE.Mesh(                 // create a plane for the raycaster
+                new THREE.PlaneGeometry(100, 100),
+                new THREE.MeshStandardMaterial({
+                    transparent: true,
+                    opacity: '0'
+                })
+            )
+            plane.rotation.x = -Math.PI / 2
+            engine.add(plane)
             
             let object = engine.object(                 // create a new object
                 new THREE.BoxGeometry(10, 10, 10),
                 new THREE.MeshStandardMaterial({ color: 'white' })
             )
-            object.position.set(-10, .1, 10)               // set the position of the object
+            object.position.set(0, .1, 0)               // set the position of the object
             engine.add(object, 'myCube')                // add the object to the scene
 
-            let pointLight = engine.object(                 // create a new object
-                new THREE.BoxGeometry(1, 1, 1),
-                new THREE.MeshBasicMaterial({ color: 'white' })
+            let ambientLight = new THREE.AmbientLight(   // create a new ambient light
+                0xffffff,                               // color
+                .25                                    // intensity
+            )
+            engine.add(ambientLight)
+
+            let pointLight = new THREE.PointLight(      // create a new point light
+                0xffffff,                               // color
+                .75,                                      // intensity
+                100                                    // distance
             )
             engine.add(pointLight, 'myPointLight')     // add the point light to the scene
 
@@ -100,8 +117,12 @@
                     false
                 )
                 if (intersects[0] !== undefined && intersects[0].point !== undefined) { // if the intersects have uv coordinates
-                    pointLight.position.copy(intersects[0].point) // set the position of the point light to the intersects point
+                    pointLight.position.x = intersects[0].point.x
+                    pointLight.position.y = (intersects[0].point.y + 15)
+                    pointLight.position.z = intersects[0].point.z
                 }
+
+                //  console.log(engine.mouse.screenPosition)
             }
         })
     }
