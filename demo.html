@@ -8,6 +8,7 @@
     <title>Demo</title>
 </head>
 <style>
+    html, body {margin: 0; height: 100%; overflow: hidden}
     #toggle {
         position: fixed;
         top: 24px;
@@ -114,7 +115,10 @@
                 pointLight.position.x = engine.mouse.worldPosition.x
                 pointLight.position.y = engine.mouse.worldPosition.y + 15
                 pointLight.position.z = engine.mouse.worldPosition.z
+
+                console.log(engine.mouse.worldPosition)
             }
+
         })
     }
 </script>
