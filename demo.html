@@ -5,7 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Demo</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
 </head>
 <style>
     #toggle {
@@ -76,15 +75,33 @@
             
             let object = engine.object(                 // create a new object
                 new THREE.BoxGeometry(10, 10, 10),
-                new THREE.MeshBasicMaterial({ color: 'white', wireframe: true }),
-                'myCube'
+                new THREE.MeshStandardMaterial({ color: 'white' })
             )
-            object.position.set(0, .1, 0)               // set the position of the object
+            object.position.set(-10, .1, 10)               // set the position of the object
             engine.add(object, 'myCube')                // add the object to the scene
+
+            let pointLight = engine.object(                 // create a new object
+                new THREE.BoxGeometry(1, 1, 1),
+                new THREE.MeshBasicMaterial({ color: 'white' })
+            )
+            engine.add(pointLight, 'myPointLight')     // add the point light to the scene
 
             engine.update = () => {                     // rotate the object for each frame
                 object.rotation.x += 0.01
                 object.rotation.y += 0.01
+
+                let raycaster = new THREE.Raycaster()   // create a new raycaster
+                raycaster.setFromCamera(                 // set the raycaster from the camera
+                    engine.mouse.screenPosition,
+                    engine.camera
+                )
+                let intersects = raycaster.intersectObjects( // get the intersects of the raycaster
+                    scene.children,
+                    false
+                )
+                if (intersects[0] !== undefined && intersects[0].point !== undefined) { // if the intersects have uv coordinates
+                    pointLight.position.copy(intersects[0].point) // set the position of the point light to the intersects point
+                }
             }
         })
     }

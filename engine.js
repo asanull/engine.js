@@ -20,7 +20,7 @@ import('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.js').then(asy
     }
     document.addEventListener('mousemove', function (event) {
         engine.mouse.screenPosition.x = (event.clientX / window.innerWidth) * 2 - 1;
-        engine.mouse.screenPosition.y = - (event.clientY / window.innerHeight) * 2 + 1;
+        engine.mouse.screenPosition.y = (event.clientY / window.innerHeight) * 2 - 1;
     })
     engine.ready.callback()
 })
