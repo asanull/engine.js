@@ -73,6 +73,8 @@ engine.load = function (object, name) {
         engine.scene = object
         engine.loaded.scene()
 
+    } else if (object instanceof THREE.Camera && !(object.type == 'PerspectiveCamera' || object instanceof THREE.OrthographicCamera)) {
+        console.log('this class is not intended to be called directly; you probably want a PerspectiveCamera or OrthographicCamera instead.')
     } else if (object instanceof THREE.PerspectiveCamera || object instanceof THREE.OrthographicCamera) {
         engine.camera = object
         engine.loaded.camera()
@@ -89,9 +91,7 @@ engine.load = function (object, name) {
     if (name !== undefined) object.name = name
 }
 engine.add = function (object, name) {
-    if (object instanceof THREE.Camera && !(object.type == 'PerspectiveCamera' || object instanceof THREE.OrthographicCamera)) {
-        console.log('this class is not intended to be called directly; you probably want a PerspectiveCamera or OrthographicCamera instead.')
-    } else if (object instanceof THREE.Object3D) {
+    if (object instanceof THREE.Object3D) {
         engine.scene.add(object)
     } else if (object instanceof THREE.Geometry) {
         let mesh = new THREE.Mesh(object)
